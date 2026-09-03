@@ -19,9 +19,33 @@
             border: 1px solid #333; 
             margin-bottom: 20px; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+        .ad-media {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            background: #1a1a1c;
+        }
+        .ad-info {
+            padding: 12px 16px;
+            text-align: left;
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            background: #252528;
+        }
+        .ad-title { font-size: 14px; font-weight: bold; color: #fff; margin: 0; }
+        .ad-desc { font-size: 12px; color: #aaa; margin: 3px 0 0 0; }
+        .ad-cta-btn {
+            background: #007AFF;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            white-space: nowrap;
         }
         .ad-timer-bar {
             width: 100%;
@@ -33,19 +57,6 @@
             width: 0%;
             background: #FF3B30;
             transition: width 1s linear;
-        }
-        .ad-slot {
-            width: 300px;
-            height: 250px;
-            min-width: 300px;
-            min-height: 250px;
-            margin: 15px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
-            border-radius: 6px;
-            overflow: hidden;
         }
         
         .btn { padding: 15px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 85%; max-width: 320px; font-weight: bold; text-decoration: none; box-sizing: border-box; }
@@ -69,7 +80,6 @@
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.75), 0 0 0 6px #2a2a2e;
             transition: transform 4.5s cubic-bezier(0.12, 0.8, 0.15, 1);
         }
-        /* Right-Side Pointer */
         .pointer-right { 
             position: absolute; 
             right: -4px; 
@@ -111,24 +121,27 @@
     <!-- SCREEN 1: ADVERTISEMENT -->
     <div id="screen-ad" class="screen">
         <h2 style="margin-bottom: 6px;">스폰서 광고</h2>
-        <p style="color: #888; font-size: 13px; margin: 0 0 16px 0;">광고 시청 후 룰렛 이용이 가능합니다</p>
+        <p style="color: #888; font-size: 13px; margin: 0 0 16px 0;">광고 확인 후 룰렛 이용이 가능합니다</p>
 
         <div class="ad-container">
             <div class="ad-timer-bar">
                 <div id="ad-progress" class="ad-timer-fill"></div>
             </div>
             
-            <div class="ad-slot">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '5f97e139ce627335bf1eb98565af5e14',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://www.highrevenueformat.com/5f97e139ce627335bf1eb98565af5e14/invoke.js"></script>
+            <a href="https://www.instagram.com/r000h___/" target="_blank" style="display: block; text-decoration: none;">
+                <img 
+                    class="ad-media" 
+                    src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" 
+                    alt="Sponsored Banner"
+                />
+            </a>
+
+            <div class="ad-info">
+                <div>
+                    <p class="ad-title">스폰서 파트너스</p>
+                    <p class="ad-desc">공식 채널 방문하고 혜택 받기</p>
+                </div>
+                <a href="https://www.instagram.com/r000h___/" target="_blank" class="ad-cta-btn">자세히 보기</a>
             </div>
         </div>
 
@@ -196,7 +209,6 @@
             startAdTimer();
         }
 
-        // AD TIMER & PROGRESS BAR
         function startAdTimer() {
             let totalSeconds = 5;
             let secondsRemaining = totalSeconds;
@@ -219,7 +231,6 @@
             }, 1000);
         }
 
-        // CARNIVAL WHEEL RENDER
         const canvas = document.getElementById("wheel-canvas");
         const ctx = canvas.getContext("2d");
 
@@ -260,13 +271,11 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Rim
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius + 10, 0, 2 * Math.PI);
             ctx.fillStyle = "#222226";
             ctx.fill();
 
-            // Slices
             slices.forEach((slice, i) => {
                 const startAngle = i * sliceAngle;
                 const endAngle = startAngle + sliceAngle;
@@ -297,7 +306,6 @@
                 ctx.restore();
             });
 
-            // Outer Pegs
             for (let i = 0; i < numSlices; i++) {
                 const pinAngle = i * sliceAngle;
                 const pinX = centerX + (radius + 2) * Math.cos(pinAngle);
@@ -312,7 +320,6 @@
                 ctx.stroke();
             }
 
-            // Central White Hub
             ctx.beginPath();
             ctx.arc(centerX, centerY, hubRadius, 0, 2 * Math.PI);
             ctx.fillStyle = "#F5F5F7";
@@ -321,14 +328,12 @@
             ctx.strokeStyle = "#222226";
             ctx.stroke();
 
-            // Hub Text
             ctx.fillStyle = "#222226";
             ctx.font = "bold 26px 'Arial Black', sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText("ODEIYA", centerX, centerY - 32);
 
-            // Hub Center Cap
             ctx.beginPath();
             ctx.arc(centerX, centerY, 26, 0, 2 * Math.PI);
             ctx.fillStyle = "#E53935";
@@ -345,7 +350,6 @@
 
         drawCarnivalWheel();
 
-        // PROBABILITY SPIN LOGIC
         function spinWheel() {
             if (localStorage.getItem(spinKey) === "true") {
                 showScreen("screen-used");
@@ -393,7 +397,6 @@
 
         document.getElementById("spin-btn").addEventListener("click", spinWheel);
 
-        // DATA WRITE TO GOOGLE APPS SCRIPT
         document.getElementById("submit-btn").addEventListener("click", () => {
             const igHandle = document.getElementById("ig-username").value;
             if (igHandle.trim() === "") {
