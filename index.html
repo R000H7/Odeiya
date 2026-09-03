@@ -6,16 +6,64 @@
     <title>Odeiya - Spin & Win!</title>
     <style>
         body { font-family: 'Arial', sans-serif; background: #121214; color: white; text-align: center; margin: 0; overflow-x: hidden; }
-        .screen { display: none; padding: 15px; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; }
+        .screen { display: none; padding: 20px; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; }
         .active { display: flex; }
         
         /* AD SCREEN */
-        .ad-box { width: 100%; max-width: 350px; height: 250px; background: #222; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-weight: bold; color: #888; border: 1px dashed #444; border-radius: 8px; }
-        .btn { padding: 16px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 88%; max-width: 340px; font-weight: bold; text-decoration: none; box-sizing: border-box; }
+        .ad-container { 
+            width: 100%; 
+            max-width: 350px; 
+            background: #1c1c1e; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid #333; 
+            margin-bottom: 20px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        }
+        .ad-media {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            background: #000;
+        }
+        .ad-info {
+            padding: 12px 16px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #252528;
+        }
+        .ad-title { font-size: 14px; font-weight: bold; color: #fff; margin: 0; }
+        .ad-desc { font-size: 12px; color: #aaa; margin: 3px 0 0 0; }
+        .ad-cta-btn {
+            background: #007AFF;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .ad-timer-bar {
+            width: 100%;
+            height: 4px;
+            background: #333;
+        }
+        .ad-timer-fill {
+            height: 100%;
+            width: 0%;
+            background: #FF3B30;
+            transition: width 1s linear;
+        }
+        
+        .btn { padding: 15px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 85%; max-width: 320px; font-weight: bold; text-decoration: none; box-sizing: border-box; }
         #skip-btn { opacity: 0.5; pointer-events: none; }
         #skip-btn.ready { background: #FF3B30; opacity: 1; pointer-events: auto; cursor: pointer; }
 
-        /* EXPANDED CARNIVAL WHEEL SCREEN */
+        /* CARNIVAL WHEEL SCREEN */
         .wheel-wrapper {
             position: relative;
             width: min(94vw, 390px);
@@ -73,9 +121,29 @@
 
     <!-- SCREEN 1: ADVERTISEMENT -->
     <div id="screen-ad" class="screen">
-        <h2>Sponsored Ad</h2>
-        <div class="ad-box">AD BANNER / VIDEO PLACEMENT HERE</div>
-        <button id="skip-btn" class="btn">Wait 5 seconds...</button>
+        <h2 style="margin-bottom: 6px;">스폰서 광고</h2>
+        <p style="color: #888; font-size: 13px; margin: 0 0 16px 0;">광고 시청 후 룰렛 이용이 가능합니다</p>
+
+        <div class="ad-container">
+            <div class="ad-timer-bar">
+                <div id="ad-progress" class="ad-timer-fill"></div>
+            </div>
+            
+            <!-- Video Ad Placement (Autoplay, Loop, Playsinline) -->
+            <video id="sponsor-video" class="ad-media" autoplay muted playsinline loop>
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+            </video>
+
+            <div class="ad-info">
+                <div>
+                    <p class="ad-title">스폰서 파트너스</p>
+                    <p class="ad-desc">공식 스폰서 채널 방문하기</p>
+                </div>
+                <a href="https://www.instagram.com/r000h___/" target="_blank" class="ad-cta-btn">자세히 보기</a>
+            </div>
+        </div>
+
+        <button id="skip-btn" class="btn">5초 후 건너뛰기</button>
     </div>
 
     <!-- SCREEN 2: THE WHEEL -->
@@ -139,21 +207,30 @@
             startAdTimer();
         }
 
+        // AD TIMER & PROGRESS BAR
         function startAdTimer() {
-            let timeLeft = 5;
+            let totalSeconds = 5;
+            let secondsRemaining = totalSeconds;
             const skipBtn = document.getElementById("skip-btn");
+            const progressBar = document.getElementById("ad-progress");
+            
             const timer = setInterval(() => {
-                timeLeft--;
-                skipBtn.innerText = `Wait ${timeLeft} seconds...`;
-                if (timeLeft <= 0) {
+                secondsRemaining--;
+                const elapsedPercent = ((totalSeconds - secondsRemaining) / totalSeconds) * 100;
+                progressBar.style.width = elapsedPercent + "%";
+
+                if (secondsRemaining > 0) {
+                    skipBtn.innerText = `${secondsRemaining}초 후 건너뛰기`;
+                } else {
                     clearInterval(timer);
-                    skipBtn.innerText = "광고 건너뛰기";
+                    skipBtn.innerText = "광고 건너뛰기 & 룰렛 돌리기";
                     skipBtn.classList.add("ready");
                     skipBtn.onclick = () => showScreen("screen-wheel");
                 }
             }, 1000);
         }
 
+        // CARNIVAL WHEEL RENDER
         const canvas = document.getElementById("wheel-canvas");
         const ctx = canvas.getContext("2d");
 
@@ -194,13 +271,13 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dark Outer Rim
+            // Rim
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius + 10, 0, 2 * Math.PI);
             ctx.fillStyle = "#222226";
             ctx.fill();
 
-            // Slices & Radial Typography
+            // Slices
             slices.forEach((slice, i) => {
                 const startAngle = i * sliceAngle;
                 const endAngle = startAngle + sliceAngle;
@@ -222,18 +299,16 @@
                 ctx.textBaseline = "middle";
                 ctx.fillStyle = slice.text;
 
-                // Scaled Value Numeral
                 ctx.font = "bold 38px 'Arial Black', Impact, sans-serif";
                 ctx.fillText(slice.label, radius * 0.72, 0);
 
-                // Denomination
                 ctx.font = "bold 15px Arial, sans-serif";
                 ctx.fillText(slice.sub, radius * 0.88, 0);
 
                 ctx.restore();
             });
 
-            // Outer Perimeter Pegs
+            // Outer Pegs
             for (let i = 0; i < numSlices; i++) {
                 const pinAngle = i * sliceAngle;
                 const pinX = centerX + (radius + 2) * Math.cos(pinAngle);
@@ -257,14 +332,14 @@
             ctx.strokeStyle = "#222226";
             ctx.stroke();
 
-            // Hub Branding
+            // Hub Text
             ctx.fillStyle = "#222226";
             ctx.font = "bold 26px 'Arial Black', sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText("ODEIYA", centerX, centerY - 32);
 
-            // Center Bolt Cap
+            // Hub Center Cap
             ctx.beginPath();
             ctx.arc(centerX, centerY, 26, 0, 2 * Math.PI);
             ctx.fillStyle = "#E53935";
@@ -273,7 +348,6 @@
             ctx.strokeStyle = "#ffffff";
             ctx.stroke();
 
-            // Center Rivet Highlight
             ctx.beginPath();
             ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
             ctx.fillStyle = "#8E0000";
@@ -282,6 +356,7 @@
 
         drawCarnivalWheel();
 
+        // PROBABILITY SPIN LOGIC
         function spinWheel() {
             if (localStorage.getItem(spinKey) === "true") {
                 showScreen("screen-used");
@@ -329,6 +404,7 @@
 
         document.getElementById("spin-btn").addEventListener("click", spinWheel);
 
+        // DATA WRITE TO GOOGLE APPS SCRIPT
         document.getElementById("submit-btn").addEventListener("click", () => {
             const igHandle = document.getElementById("ig-username").value;
             if (igHandle.trim() === "") {
