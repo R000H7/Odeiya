@@ -5,44 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odeiya - Spin & Win!</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background: #111; color: white; text-align: center; margin: 0; overflow-x: hidden; }
+        body { font-family: 'Arial', sans-serif; background: #121214; color: white; text-align: center; margin: 0; overflow-x: hidden; }
         .screen { display: none; padding: 20px; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; }
         .active { display: flex; }
         
         /* AD SCREEN */
-        .ad-box { width: 100%; max-width: 350px; height: 250px; background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-weight: bold; color: #888; border: 1px dashed #555;}
-        .btn { padding: 15px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 80%; max-width: 300px; font-weight: bold; text-decoration: none;}
+        .ad-box { width: 100%; max-width: 350px; height: 250px; background: #222; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-weight: bold; color: #888; border: 1px dashed #444; border-radius: 8px; }
+        .btn { padding: 15px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 85%; max-width: 320px; font-weight: bold; text-decoration: none; box-sizing: border-box; }
         #skip-btn { opacity: 0.5; pointer-events: none; }
         #skip-btn.ready { background: #FF3B30; opacity: 1; pointer-events: auto; cursor: pointer; }
 
-        /* WHEEL SCREEN */
-        .wheel-container { position: relative; width: 300px; height: 300px; margin: 20px auto; }
-        #wheel-canvas { 
-            width: 300px; 
-            height: 300px; 
-            border-radius: 50%; 
-            border: 6px solid #ffffff; 
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1);
+        /* CARNIVAL WHEEL SCREEN */
+        .wheel-wrapper {
+            position: relative;
+            width: 330px;
+            height: 330px;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .pointer { 
+        #wheel-canvas { 
+            width: 320px; 
+            height: 320px; 
+            border-radius: 50%; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 5px #2a2a2e;
+            transition: transform 4.5s cubic-bezier(0.12, 0.8, 0.15, 1);
+        }
+        /* Right-Side Pointer (3 o'clock position pointing left) */
+        .pointer-right { 
             position: absolute; 
-            top: -12px; 
-            left: 50%; 
-            transform: translateX(-50%); 
+            right: -6px; 
+            top: 50%; 
+            transform: translateY(-50%); 
             width: 0; 
             height: 0; 
-            border-left: 16px solid transparent; 
-            border-right: 16px solid transparent; 
-            border-top: 32px solid #ffffff; 
-            z-index: 10; 
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            border-top: 14px solid transparent; 
+            border-bottom: 14px solid transparent; 
+            border-right: 28px solid #FF3B30; 
+            z-index: 20; 
+            filter: drop-shadow(-3px 0 4px rgba(0,0,0,0.6));
         }
-        #spin-btn { background: #FFCC00; color: #000; cursor: pointer; margin-top: 25px; }
-        #spin-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
+        .pointer-right::after {
+            content: '';
+            position: absolute;
+            top: -7px;
+            right: -24px;
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-right: 14px solid #ffffff;
+        }
+        #spin-btn { background: #FFCC00; color: #111; cursor: pointer; margin-top: 25px; box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3); }
+        #spin-btn:disabled { background: #444; color: #777; cursor: not-allowed; box-shadow: none; }
         
         /* FORM SCREEN */
-        input { padding: 15px; font-size: 18px; width: 80%; max-width: 270px; margin-bottom: 20px; border-radius: 8px; border: none; text-align: center; outline: none;}
+        input { padding: 15px; font-size: 18px; width: 85%; max-width: 290px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; text-align: center; outline: none; }
         #submit-btn { background: #007AFF; cursor: pointer; }
         
         /* DM & LOCKED SCREENS */
@@ -61,40 +80,43 @@
 
     <!-- SCREEN 2: THE WHEEL -->
     <div id="screen-wheel" class="screen">
-        <h2>Spin to Win!</h2>
-        <p>Win up to 100,000 KRW</p>
-        <div class="wheel-container">
-            <div class="pointer"></div>
-            <canvas id="wheel-canvas" width="600" height="600"></canvas>
+        <h2 style="margin-bottom: 4px;">행운의 룰렛</h2>
+        <p style="color: #aaa; margin-top: 0; font-size: 15px;">최대 100,000원의 상금을 잡으세요!</p>
+        
+        <div class="wheel-wrapper">
+            <div class="pointer-right"></div>
+            <canvas id="wheel-canvas" width="700" height="700"></canvas>
         </div>
-        <button id="spin-btn" class="btn">SPIN THE WHEEL</button>
+
+        <button id="spin-btn" class="btn">룰렛 돌리기</button>
     </div>
 
     <!-- SCREEN 3: CLAIM FORM -->
     <div id="screen-form" class="screen">
-        <h1 id="prize-text" style="color: #FFCC00;">You won!</h1>
-        <p>Enter your Instagram username so we can send your prize details.</p>
-        <input type="text" id="ig-username" placeholder="@your_username" required>
-        <button id="submit-btn" class="btn">Claim Prize</button>
+        <h1 id="prize-text" style="color: #FFCC00; font-size: 32px; margin-bottom: 10px;">당첨!</h1>
+        <p style="color: #ccc; margin-bottom: 25px;">상금 수령 안내를 위해 인스타그램 아이디를 입력해주세요.</p>
+        <input type="text" id="ig-username" placeholder="@your_instagram" required>
+        <button id="submit-btn" class="btn">상금 수령 등록</button>
     </div>
 
     <!-- SCREEN 4: DM PROMPT -->
     <div id="screen-dm" class="screen">
-        <h1 style="color: #34C759;">Prize Secured! 🔒</h1>
-        <p>Your details have been saved.</p>
-        <p>You MUST DM us right now to verify your account and receive your money.</p>
-        <a href="https://www.instagram.com/r000h___/" class="btn dm-btn" target="_blank">Click here to DM us</a>
+        <h1 style="color: #34C759; margin-bottom: 10px;">등록 완료! 🔒</h1>
+        <p style="color: #ccc; line-height: 1.5; margin-bottom: 25px;">
+            정보가 정상적으로 저장되었습니다.<br>
+            아래 버튼을 눌러 인스타그램 DM을 보내주셔야 검증 후 상금이 지급됩니다.
+        </p>
+        <a href="https://www.instagram.com/r000h___/" class="btn dm-btn" target="_blank">인스타그램 DM 보내기</a>
     </div>
 
     <!-- SCREEN 5: ACCESS BLOCKED (ALREADY USED) -->
     <div id="screen-used" class="screen">
         <div class="lock-card">
-            <h1 style="color: #FF3B30; margin-bottom: 10px;">Link Expired 🚫</h1>
+            <h1 style="color: #FF3B30; margin-bottom: 10px;">참여 완료 🚫</h1>
             <p style="color: #aaa; line-height: 1.5; margin-bottom: 25px;">
-                You have already participated using this specific QR code link. Each link can only be used once per person.
+                이미 이 QR 코드로 참여를 완료하셨습니다.<br>해당 링크는 1인 1회만 이용 가능합니다.
             </p>
-            <p style="font-size: 14px; color: #888; margin-bottom: 20px;">Need to check your prize status?</p>
-            <a href="https://www.instagram.com/r000h___/" class="btn dm-btn" target="_blank">DM us on Instagram</a>
+            <a href="https://www.instagram.com/r000h___/" class="btn dm-btn" target="_blank">상금 문의 (DM)</a>
         </div>
     </div>
 
@@ -111,7 +133,7 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        // IMMEDIATE ENTRY CHECK
+        // ENTRY CHECK: Prevent reusing the same link
         if (localStorage.getItem(spinKey) === "true") {
             showScreen("screen-used");
         } else {
@@ -128,78 +150,146 @@
                 skipBtn.innerText = `Wait ${timeLeft} seconds...`;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    skipBtn.innerText = "Skip Ad & Go to Wheel";
+                    skipBtn.innerText = "광고 건너뛰기";
                     skipBtn.classList.add("ready");
                     skipBtn.onclick = () => showScreen("screen-wheel");
                 }
             }, 1000);
         }
 
-        // DRAW WHEEL CANVAS WITH TEXT
+        // --- 24-SEGMENT CARNIVAL WHEEL CONFIGURATION ---
         const canvas = document.getElementById("wheel-canvas");
         const ctx = canvas.getContext("2d");
 
+        // Palette matching reference image: Yellow (1), Blue (5), Green (5), Pink (10), Red (100)
         const slices = [
-            { text: "1,000원", color: "#FF3B30", textColor: "#FFFFFF" },
-            { text: "5,000원", color: "#34C759", textColor: "#FFFFFF" },
-            { text: "10,000원", color: "#FFCC00", textColor: "#111111" },
-            { text: "100,000원", color: "#007AFF", textColor: "#FFFFFF" }
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#1E88E5", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#43A047", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "10", sub: "만원", prize: "10,000 KRW", color: "#E91E63", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#1E88E5", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#43A047", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "100", sub: "만원", prize: "100,000 KRW", color: "#E53935", text: "#FFF" }, // Jackpot
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#1E88E5", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#43A047", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "10", sub: "만원", prize: "10,000 KRW", color: "#E91E63", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#1E88E5", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#43A047", text: "#FFF" },
+            { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
+            { label: "10", sub: "만원", prize: "10,000 KRW", color: "#E91E63", text: "#FFF" }
         ];
 
-        function drawWheel() {
+        function drawCarnivalWheel() {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = centerX;
-            const sliceAngle = (2 * Math.PI) / slices.length;
+            const radius = centerX - 12; // Leave border space for pins
+            const numSlices = slices.length;
+            const sliceAngle = (2 * Math.PI) / numSlices;
+            const hubRadius = radius * 0.44; // Wide white center hub like reference
 
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw outer dark rim
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius + 8, 0, 2 * Math.PI);
+            ctx.fillStyle = "#222226";
+            ctx.fill();
+
+            // Draw slices & radial text
             slices.forEach((slice, i) => {
-                const startAngle = (i * sliceAngle) - (Math.PI / 2);
+                const startAngle = i * sliceAngle;
                 const endAngle = startAngle + sliceAngle;
 
-                // Sector Arc
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
                 ctx.fillStyle = slice.color;
                 ctx.fill();
 
-                // Slice Dividers
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = "#ffffff";
+                // Slice edge lines
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = "#333333";
                 ctx.stroke();
 
-                // Price Text
+                // Radial number text matching reference placement
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + (sliceAngle / 2));
-                ctx.textAlign = "right";
+                ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillStyle = slice.textColor;
-                ctx.font = "bold 38px Arial, sans-serif";
-                ctx.fillText(slice.text, radius - 45, 0);
+                ctx.fillStyle = slice.text;
+
+                // Value numeral
+                ctx.font = "bold 32px 'Arial Black', Impact, sans-serif";
+                ctx.fillText(slice.label, radius * 0.72, 0);
+
+                // Denomination unit underneath
+                ctx.font = "bold 13px Arial, sans-serif";
+                ctx.fillText(slice.sub, radius * 0.88, 0);
+
                 ctx.restore();
             });
 
-            // Center Pin
+            // Outer perimeter pins (metal pegs)
+            for (let i = 0; i < numSlices; i++) {
+                const pinAngle = i * sliceAngle;
+                const pinX = centerX + (radius + 2) * Math.cos(pinAngle);
+                const pinY = centerY + (radius + 2) * Math.sin(pinAngle);
+
+                ctx.beginPath();
+                ctx.arc(pinX, pinY, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = "#ffffff";
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "#111111";
+                ctx.stroke();
+            }
+
+            // Central White Hub
             ctx.beginPath();
-            ctx.arc(centerX, centerY, 45, 0, 2 * Math.PI);
-            ctx.fillStyle = "#ffffff";
+            ctx.arc(centerX, centerY, hubRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = "#F5F5F7";
             ctx.fill();
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "#111111";
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "#222226";
             ctx.stroke();
 
-            // Center Label
-            ctx.fillStyle = "#111111";
-            ctx.font = "bold 18px Arial, sans-serif";
+            // Inner hub branding
+            ctx.fillStyle = "#333333";
+            ctx.font = "bold 22px 'Arial Black', sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText("ODEIYA", centerX, centerY);
+            ctx.fillText("ODEIYA", centerX, centerY - 28);
+
+            // Red central axle bolt
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 22, 0, 2 * Math.PI);
+            ctx.fillStyle = "#E53935";
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+
+            // Center rivet highlight
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 7, 0, 2 * Math.PI);
+            ctx.fillStyle = "#8E0000";
+            ctx.fill();
         }
 
-        drawWheel();
+        drawCarnivalWheel();
 
-        // WHEEL LOGIC (~4,940 KRW Mathematical Average)
+        // --- CALIBRATED PROBABILITY & SPIN MECHANIC ---
         function spinWheel() {
             if (localStorage.getItem(spinKey) === "true") {
                 showScreen("screen-used");
@@ -208,46 +298,66 @@
 
             document.getElementById("spin-btn").disabled = true;
 
+            // Target distribution: 1k @ 44%, 5k @ 40%, 10k @ 15%, 100k @ 1% (EV: 4,940 KRW)
             const rand = Math.random() * 100;
-            let targetAngle = 0;
+            let targetPrize = "";
 
             if (rand < 44) {
-                wonPrize = "1,000원";
-                targetAngle = 315; // 1,000원 slice
+                targetPrize = "1,000 KRW";
             } else if (rand < 84) {
-                wonPrize = "5,000원";
-                targetAngle = 225; // 5,000원 slice
+                targetPrize = "5,000 KRW";
             } else if (rand < 99) {
-                wonPrize = "10,000원";
-                targetAngle = 135; // 10,000원 slice
+                targetPrize = "10,000 KRW";
             } else {
-                wonPrize = "100,000원";
-                targetAngle = 45;  // 100,000원 slice (1%)
+                targetPrize = "100,000 KRW";
             }
 
-            const totalRotation = (360 * 5) + targetAngle;
+            wonPrize = targetPrize;
+
+            // Collect all matching wheel indices for the chosen prize
+            const matchingIndices = [];
+            slices.forEach((slice, idx) => {
+                if (slice.prize === targetPrize) matchingIndices.push(idx);
+            });
+
+            // Randomly select one of the valid wedges on the wheel
+            const targetSliceIndex = matchingIndices[Math.floor(Math.random() * matchingIndices.length)];
+
+            // Calculate degrees to land at the 3 o'clock pointer (0 degrees)
+            const sliceDeg = 360 / slices.length; // 15 degrees per slice
+            const sliceCenterDeg = (targetSliceIndex + 0.5) * sliceDeg;
+
+            // Offset to align slice center with 0 deg (3 o'clock) when rotating clockwise
+            const stopDeg = (360 - sliceCenterDeg) % 360;
+
+            // Add organic visual jitter within the wedge bounds (staying within +/- 35% of the center)
+            const jitter = (Math.random() - 0.5) * (sliceDeg * 0.7);
+
+            // 6 full rotations (2160 deg) + exact alignment angle
+            const totalRotation = (360 * 6) + stopDeg + jitter;
             canvas.style.transform = `rotate(${totalRotation}deg)`;
 
+            // Lock this URL to prevent multiple spins
             localStorage.setItem(spinKey, "true");
 
             setTimeout(() => {
-                document.getElementById("prize-text").innerText = `You won ${wonPrize}!`;
+                document.getElementById("prize-text").innerText = `${wonPrize} 당첨!`;
                 showScreen("screen-form");
-            }, 4200);
+            }, 4700);
         }
 
         document.getElementById("spin-btn").addEventListener("click", spinWheel);
 
-        // DATABASE SUBMISSION LOGIC
+        // DATABASE SUBMISSION VIA GET REQUEST
         document.getElementById("submit-btn").addEventListener("click", () => {
             const igHandle = document.getElementById("ig-username").value;
             if (igHandle.trim() === "") {
-                alert("Please enter your Instagram handle.");
+                alert("인스타그램 아이디를 입력해주세요.");
                 return;
             }
 
             const submitBtn = document.getElementById("submit-btn");
-            submitBtn.innerText = "Saving...";
+            submitBtn.innerText = "저장 중...";
             submitBtn.disabled = true;
 
             const GOOGLE_APP_URL = "https://script.google.com/macros/s/AKfycbxZtE2Ap0KnwBxtRPyMAzUtJeu3-SDZZIBuVBobL4eDSvNtJ8UOrv_5zQ1kl3Ovcsr5cQ/exec";
