@@ -5,52 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odeiya - Spin & Win!</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background: #121214; color: white; text-align: center; margin: 0; overflow-x: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; background: #121214; color: white; text-align: center; margin: 0; overflow-x: hidden; }
         .screen { display: none; padding: 20px; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; }
         .active { display: flex; }
         
-        /* AD SCREEN */
-        .ad-container { 
-            width: 100%; 
-            max-width: 350px; 
-            background: #1c1c1e; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            border: 1px solid #333; 
-            margin-bottom: 20px; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        /* SPONSOR MISSION CARD */
+        .mission-card {
+            width: 100%;
+            max-width: 340px;
+            background: #1c1c1e;
+            border-radius: 14px;
+            padding: 24px 20px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .ad-timer-bar {
-            width: 100%;
-            height: 4px;
-            background: #333;
+        .sponsor-badge {
+            background: #007AFF;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
         }
-        .ad-timer-fill {
-            height: 100%;
-            width: 0%;
-            background: #FF3B30;
-            transition: width 1s linear;
-        }
-        .ad-slot {
-            width: 300px;
-            height: 250px;
-            min-width: 300px;
-            min-height: 250px;
-            margin: 15px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #1a1a1c;
-            border-radius: 6px;
-            overflow: hidden;
-        }
+        .mission-title { font-size: 20px; font-weight: 700; margin: 0 0 8px 0; }
+        .mission-desc { font-size: 13px; color: #aaa; line-height: 1.5; margin: 0 0 20px 0; }
         
+        .coupang-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #E53935;
+            color: #ffffff;
+            width: 100%;
+            padding: 16px 0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(229, 57, 53, 0.4);
+            transition: transform 0.15s ease, background 0.2s;
+        }
+        .coupang-btn:active { transform: scale(0.98); }
+        .coupang-legal {
+            font-size: 10px;
+            color: #666;
+            margin-top: 14px;
+            line-height: 1.3;
+        }
+
+        /* BUTTONS */
         .btn { padding: 15px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 85%; max-width: 320px; font-weight: bold; text-decoration: none; box-sizing: border-box; }
-        #skip-btn { opacity: 0.5; pointer-events: none; }
-        #skip-btn.ready { background: #FF3B30; opacity: 1; pointer-events: auto; cursor: pointer; }
 
         /* CARNIVAL WHEEL SCREEN */
         .wheel-wrapper {
@@ -107,31 +120,21 @@
 </head>
 <body>
 
-    <!-- SCREEN 1: ADVERTISEMENT (Active by default to ensure script renders with dimensions) -->
+    <!-- SCREEN 1: 1-CLICK COUPANG PARTNERS UNLOCK -->
     <div id="screen-ad" class="screen active">
-        <h2 style="margin-bottom: 6px;">스폰서 광고</h2>
-        <p style="color: #888; font-size: 13px; margin: 0 0 16px 0;">광고 시청 후 룰렛 이용이 가능합니다</p>
-
-        <div class="ad-container">
-            <div class="ad-timer-bar">
-                <div id="ad-progress" class="ad-timer-fill"></div>
-            </div>
+        <div class="mission-card">
+            <span class="sponsor-badge">SPONSOR MISSION</span>
+            <h2 class="mission-title">스폰서 확인 후 룰렛 열기</h2>
+            <p class="mission-desc">아래 버튼을 눌러 스폰서 특가 상품을 확인하시면 룰렛 잠금이 즉시 해제됩니다.</p>
             
-            <div class="ad-slot">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '5f97e139ce627335bf1eb98565af5e14',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://www.highrevenueformat.com/5f97e139ce627335bf1eb98565af5e14/invoke.js"></script>
-            </div>
-        </div>
+            <button id="btn-coupang-unlock" class="coupang-btn">
+                <span>⚡ 쿠팡 특가 보고 룰렛 돌리기</span>
+            </button>
 
-        <button id="skip-btn" class="btn">5초 후 건너뛰기</button>
+            <p class="coupang-legal">
+                이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+            </p>
+        </div>
     </div>
 
     <!-- SCREEN 2: THE WHEEL -->
@@ -177,6 +180,14 @@
     </div>
 
     <script>
+        // ==========================================
+        // 1. CONFIGURATION
+        // ==========================================
+        // Replace this with your personal Coupang Partners short link (e.g. https://link.coupang.com/a/xxxxxx)
+        const COUPANG_AFFILIATE_URL = "https://link.coupang.com/a/b7fK0M"; 
+        
+        const GOOGLE_APP_URL = "https://script.google.com/macros/s/AKfycbxZtE2Ap0KnwBxtRPyMAzUtJeu3-SDZZIBuVBobL4eDSvNtJ8UOrv_5zQ1kl3Ovcsr5cQ/exec";
+
         let wonPrize = "";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -188,37 +199,25 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        // Gatekeeping check: If already used, switch immediately to blocked screen
+        // Gatekeeping: Check if link was already used
         if (localStorage.getItem(spinKey) === "true") {
             showScreen("screen-used");
-        } else {
-            startAdTimer();
         }
 
-        // AD TIMER & PROGRESS BAR
-        function startAdTimer() {
-            let totalSeconds = 5;
-            let secondsRemaining = totalSeconds;
-            const skipBtn = document.getElementById("skip-btn");
-            const progressBar = document.getElementById("ad-progress");
+        // ==========================================
+        // 2. COUPANG COOKIE DROP ACTION
+        // ==========================================
+        document.getElementById("btn-coupang-unlock").addEventListener("click", () => {
+            // Open Coupang affiliate link in a separate tab/app to set the 24-hour cookie
+            window.open(COUPANG_AFFILIATE_URL, '_blank');
             
-            const timer = setInterval(() => {
-                secondsRemaining--;
-                const elapsedPercent = ((totalSeconds - secondsRemaining) / totalSeconds) * 100;
-                progressBar.style.width = elapsedPercent + "%";
+            // Immediately transition the current window to the wheel
+            showScreen("screen-wheel");
+        });
 
-                if (secondsRemaining > 0) {
-                    skipBtn.innerText = `${secondsRemaining}초 후 건너뛰기`;
-                } else {
-                    clearInterval(timer);
-                    skipBtn.innerText = "광고 건너뛰기 & 룰렛 돌리기";
-                    skipBtn.classList.add("ready");
-                    skipBtn.onclick = () => showScreen("screen-wheel");
-                }
-            }, 1000);
-        }
-
-        // CARNIVAL WHEEL RENDER
+        // ==========================================
+        // 3. 24-SEGMENT CARNIVAL WHEEL RENDER
+        // ==========================================
         const canvas = document.getElementById("wheel-canvas");
         const ctx = canvas.getContext("2d");
 
@@ -234,7 +233,7 @@
             { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
             { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#43A047", text: "#FFF" },
             { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
-            { label: "100", sub: "만원", prize: "100,000 KRW", color: "#E53935", text: "#FFF" },
+            { label: "100", sub: "만원", prize: "100,000 KRW", color: "#E53935", text: "#FFF" }, // 100k Jackpot
             { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
             { label: "5", sub: "천원", prize: "5,000 KRW",  color: "#1E88E5", text: "#FFF" },
             { label: "1", sub: "천원", prize: "1,000 KRW",  color: "#FFD200", text: "#111" },
@@ -259,13 +258,13 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Rim
+            // Dark Outer Rim
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius + 10, 0, 2 * Math.PI);
             ctx.fillStyle = "#222226";
             ctx.fill();
 
-            // Slices
+            // Slices & Radial Typography
             slices.forEach((slice, i) => {
                 const startAngle = i * sliceAngle;
                 const endAngle = startAngle + sliceAngle;
@@ -296,7 +295,7 @@
                 ctx.restore();
             });
 
-            // Outer Pegs
+            // Outer Perimeter Pegs
             for (let i = 0; i < numSlices; i++) {
                 const pinAngle = i * sliceAngle;
                 const pinX = centerX + (radius + 2) * Math.cos(pinAngle);
@@ -320,14 +319,14 @@
             ctx.strokeStyle = "#222226";
             ctx.stroke();
 
-            // Hub Text
+            // Center Branding
             ctx.fillStyle = "#222226";
             ctx.font = "bold 26px 'Arial Black', sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText("ODEIYA", centerX, centerY - 32);
 
-            // Hub Center Cap
+            // Center Bolt Cap
             ctx.beginPath();
             ctx.arc(centerX, centerY, 26, 0, 2 * Math.PI);
             ctx.fillStyle = "#E53935";
@@ -344,7 +343,9 @@
 
         drawCarnivalWheel();
 
-        // PROBABILITY SPIN LOGIC
+        // ==========================================
+        // 4. SPIN LOGIC & PROBABILITIES
+        // ==========================================
         function spinWheel() {
             if (localStorage.getItem(spinKey) === "true") {
                 showScreen("screen-used");
@@ -353,6 +354,7 @@
 
             document.getElementById("spin-btn").disabled = true;
 
+            // Mathematical expected payout ~4,940 KRW (1k: 44%, 5k: 40%, 10k: 15%, 100k: 1%)
             const rand = Math.random() * 100;
             let targetPrize = "";
 
@@ -382,6 +384,7 @@
             const totalRotation = (360 * 6) + stopDeg + jitter;
             canvas.style.transform = `rotate(${totalRotation}deg)`;
 
+            // Lock device from re-entering this specific QR link
             localStorage.setItem(spinKey, "true");
 
             setTimeout(() => {
@@ -392,7 +395,9 @@
 
         document.getElementById("spin-btn").addEventListener("click", spinWheel);
 
-        // DATA WRITE TO GOOGLE APPS SCRIPT
+        // ==========================================
+        // 5. GOOGLE APPS SCRIPT FORM SUBMISSION
+        // ==========================================
         document.getElementById("submit-btn").addEventListener("click", () => {
             const igHandle = document.getElementById("ig-username").value;
             if (igHandle.trim() === "") {
@@ -403,8 +408,6 @@
             const submitBtn = document.getElementById("submit-btn");
             submitBtn.innerText = "저장 중...";
             submitBtn.disabled = true;
-
-            const GOOGLE_APP_URL = "https://script.google.com/macros/s/AKfycbxZtE2Ap0KnwBxtRPyMAzUtJeu3-SDZZIBuVBobL4eDSvNtJ8UOrv_5zQ1kl3Ovcsr5cQ/exec";
 
             const params = new URLSearchParams({
                 qrSource: qrSource,
