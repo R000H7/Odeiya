@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odeiya - Spin & Win!</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #111; color: white; text-align: center; margin: 0; overflow-x: hidden; }
+        .screen { display: none; padding: 20px; min-height: 100vh; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; }
+        .active { display: flex; }
+        
+        /* AD SCREEN */
+        .ad-box { width: 100%; max-width: 350px; height: 250px; background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-weight: bold; color: #888; border: 1px dashed #555;}
+        .btn { padding: 15px 30px; font-size: 18px; background: #555; color: white; border: none; border-radius: 8px; transition: 0.3s; width: 80%; max-width: 300px; font-weight: bold; text-decoration: none;}
+        #skip-btn { opacity: 0.5; pointer-events: none; }
+        #skip-btn.ready { background: #FF3B30; opacity: 1; pointer-events: auto; cursor: pointer; }
+
+        /* WHEEL SCREEN */
+        .wheel-container { position: relative; width: 300px; height: 300px; margin: 20px auto; overflow: hidden; border-radius: 50%; border: 5px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.2);}
+        .wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.17, 0.67, 0.1, 1); 
+            background: conic-gradient(#FF3B30 0deg 90deg, #34C759 90deg 180deg, #FFCC00 180deg 270deg, #007AFF 270deg 360deg); 
+        }
+        .pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid white; z-index: 10; }
+        #spin-btn { background: #FFCC00; color: #000; cursor: pointer; margin-top: 20px; }
+        #spin-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
+        
+        /* FORM SCREEN */
+        input { padding: 15px; font-size: 18px; width: 80%; max-width: 270px; margin-bottom: 20px; border-radius: 8px; border: none; text-align: center; outline: none;}
+        #submit-btn { background: #007AFF; cursor: pointer; }
+        
+        /* DM & LOCKED SCREENS */
+        .dm-btn { background: #E1306C; display: inline-flex; align-items: center; justify-content: center; }
+        .lock-card { background: #1c1c1e; border: 1px solid #333; border-radius: 12px; padding: 30px 20px; max-width: 320px; width: 90%; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: ADVERTISEMENT -->
+    <div id="screen-ad" class="screen">
+        <h2>Sponsored Ad</h2>
+        <div class="ad-box">AD BANNER / VIDEO PLACEMENT HERE</div>
+        <button id="skip-btn" class="btn">Wait 5 seconds...</button>
+    </div>
+
+    <!-- SCREEN 2: THE WHEEL -->
+    <div id="screen-wheel" class="screen">
+        <h2>Spin to Win!</h2>
+        <p>Win up to 100,000 KRW</p>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel"></div>
+        </div>
+        <button id="spin-btn" class="btn">SPIN THE WHEEL</button>
+    </div>
+
+    <!-- SCREEN 3: CLAIM FORM -->
+    <div id="screen-form" class="screen">
+        <h1 id="prize-text" style="color: #FFCC00;">You won!</h1>
+        <p>Enter your Instagram username so we can send your prize details.</p>
+        <input type="text" id="ig-username" placeholder="@your_username" required>
+        <button id="submit-btn" class="btn">Claim Prize</button>
+    </div>
+
+    <!-- SCREEN 4: DM PROMPT -->
+    <div id="screen-dm" class="screen">
+        <h1 style="color: #34C759;">Prize Secured! 🔒</h1>
+        <p>Your details have been saved.</p>
+        <p>You MUST DM us right now to verify your account and receive your money.</p>
+        <a href="https://www.instagram.com/r000h___/" class="btn dm-btn" target="_blank">Click here to DM us</a>
+    </div>
+
+    <!-- SCREEN 5: ACCESS BLOCKED (ALREADY USED) -->
+    <div id="screen-used" class="screen">
+        <div class="lock-card">
+            <h1 style="color: #FF3B30; margin-bottom: 10px;">Link Expired 🚫</h1>
+            <p style="color: #aaa; line-height: 1.5; margin-bottom: 25px;">
+                You have already participated using this specific QR code link. Each link can only be used once per person.
+            </p>
+            <p style="font-size: 14px; color: #888; margin-bottom: 20px;">Need to check your prize status?</p>
+            <a href="https://www.instagram.com/r000h___/" class="btn dm-btn" target="_blank">DM us on Instagram</a>
+        </div>
+    </div>
+
+    <script>
+        let wonPrize = "";
+
+        // Parse QR tag from URL (e.g. ?qr=Hongdae_01)
+        const urlParams = new URLSearchParams(window.location.search);
+        const qrSource = urlParams.get('qr') || "default";
+        const spinKey = "hasSpun_odeiya_" + qrSource;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // IMMEDIATE ENTRY CHECK:
+        // If this QR source was already used on this device, lock them out immediately.
+        if (localStorage.getItem(spinKey) === "true") {
+            showScreen("screen-used");
+        } else {
+            showScreen("screen-ad");
+            startAdTimer();
+        }
+
+        // AD TIMER LOGIC
+        function startAdTimer() {
+            let timeLeft = 5;
+            const skipBtn = document.getElementById("skip-btn");
+            const timer = setInterval(() => {
+                timeLeft--;
+                skipBtn.innerText = `Wait ${timeLeft} seconds...`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    skipBtn.innerText = "Skip Ad & Go to Wheel";
+                    skipBtn.classList.add("ready");
+                    skipBtn.onclick = () => showScreen("screen-wheel");
+                }
+            }, 1000);
+        }
+
+        // WHEEL LOGIC (~4,940 KRW Mathematical Average)
+        function spinWheel() {
+            if (localStorage.getItem(spinKey) === "true") {
+                showScreen("screen-used");
+                return;
+            }
+
+            document.getElementById("spin-btn").disabled = true;
+
+            const rand = Math.random() * 100;
+            let targetAngle = 0;
+
+            if (rand < 44) {
+                wonPrize = "1,000 KRW";
+                targetAngle = 315; // Red slice
+            } else if (rand < 84) { // 44 + 40
+                wonPrize = "5,000 KRW";
+                targetAngle = 225; // Green slice
+            } else if (rand < 99) { // 84 + 15
+                wonPrize = "10,000 KRW";
+                targetAngle = 135; // Yellow slice
+            } else {
+                wonPrize = "100,000 KRW";
+                targetAngle = 45;  // Blue slice (1%)
+            }
+
+            // Spin 5 full turns + target angle
+            const totalRotation = (360 * 5) + targetAngle;
+            document.getElementById("wheel").style.transform = `rotate(${totalRotation}deg)`;
+
+            // Lock this link permanently in local storage
+            localStorage.setItem(spinKey, "true");
+
+            setTimeout(() => {
+                document.getElementById("prize-text").innerText = `You won ${wonPrize}!`;
+                showScreen("screen-form");
+            }, 4200);
+        }
+
+        document.getElementById("spin-btn").addEventListener("click", spinWheel);
+
+        // DATABASE SUBMISSION LOGIC
+        document.getElementById("submit-btn").addEventListener("click", () => {
+            const igHandle = document.getElementById("ig-username").value;
+            if (igHandle.trim() === "") {
+                alert("Please enter your Instagram handle.");
+                return;
+            }
+
+            const submitBtn = document.getElementById("submit-btn");
+            submitBtn.innerText = "Saving...";
+            submitBtn.disabled = true;
+
+            const GOOGLE_APP_URL = "https://script.google.com/macros/s/AKfycbxZtE2Ap0KnwBxtRPyMAzUtJeu3-SDZZIBuVBobL4eDSvNtJ8UOrv_5zQ1kl3Ovcsr5cQ/exec";
+
+            const params = new URLSearchParams({
+                qrSource: qrSource,
+                igUsername: igHandle,
+                prize: wonPrize
+            });
+            
+            const finalUrl = GOOGLE_APP_URL + "?" + params.toString();
+
+            fetch(finalUrl, { 
+                method: 'GET', 
+                mode: 'no-cors' 
+            }).then(() => {
+                showScreen("screen-dm");
+            }).catch(() => {
+                showScreen("screen-dm"); 
+            });
+        });
+    </script>
+</body>
+</html>
